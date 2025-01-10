@@ -271,6 +271,8 @@ fn compute_contacts_for_pair_of_cells(
                     // Those will already be detected as fluid-boundary contacts instead.
                     match entry {
                         HGridEntry::BoundaryParticle(boundary_j, particle_j) => {
+                            continue;
+
                             let bi = &boundaries[*boundary_i];
                             let bj = &boundaries[*boundary_j];
                             if *boundary_i != *boundary_j
