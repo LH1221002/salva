@@ -80,6 +80,8 @@ impl LiquidWorld {
             fluid.apply_particles_removal();
         }
 
+        // self.counters.log("New step");
+
         // Perform substeps.
         while !self.timestep_manager.is_done() {
             self.nsubsteps_since_sort += 1;

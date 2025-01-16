@@ -97,15 +97,15 @@ where
                     assert!(!denominator.is_zero());
                     *volume = na::one::<Real>() / denominator;
 
-                    contact_log.push_str(&format!(
-                        "{}: N {}, ",
-                        i, boundary_boundary_contacts[boundary_id]
-                            .particle_contacts(i).read().unwrap().len()
-                    ));
-                    volume_log.push_str(&format!(
-                        "{}: Vol {}, ",
-                        i, volume
-                    ));
+                    // contact_log.push_str(&format!(
+                    //     "{}: N {}, ",
+                    //     i, boundary_boundary_contacts[boundary_id]
+                    //         .particle_contacts(i).read().unwrap().len()
+                    // ));
+                    // volume_log.push_str(&format!(
+                    //     "{}: Vol {}, ",
+                    //     i, volume
+                    // ));
                 })
         }
 

@@ -63,7 +63,7 @@ pub fn update_boundary_contacts<KernelDensity: Kernel, KernelGradient: Kernel>(
                 c.weight = KernelDensity::points_apply(&pi, &pj, kernel_radius);
                 c.gradient = KernelGradient::points_apply_diff1(&pi, &pj, kernel_radius);
 
-                weights_log.push_str(&format!("{} ", c.weight));
+                // weights_log.push_str(&format!("{} ", c.weight));
             }
         })
     }
