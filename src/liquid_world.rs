@@ -121,6 +121,7 @@ impl LiquidWorld {
 
             self.counters.stages.solver_time.resume();
             self.solver.evaluate_kernels(
+                &mut self.counters,
                 self.h,
                 &mut self.contact_manager,
                 self.fluids.as_slice(),
@@ -128,6 +129,7 @@ impl LiquidWorld {
             );
 
             self.solver.compute_densities(
+                &mut self.counters,
                 &self.contact_manager,
                 self.fluids.as_slice(),
                 self.boundaries.as_mut_slice(),

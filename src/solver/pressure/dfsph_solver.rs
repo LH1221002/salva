@@ -70,10 +70,15 @@ where
     }
 
     fn compute_boundary_volumes(
+        // TODO: Is this even correct? TODO: Only do once?
         &mut self,
+        counters: &mut Counters,
         boundary_boundary_contacts: &[ParticlesContacts],
         boundaries: &mut [Boundary],
     ) {
+        let mut contact_log = String::new();
+        let mut volume_log = String::new();
+
         for boundary_id in 0..boundaries.len() {
             par_iter_mut!(boundaries[boundary_id].volumes)
                 .enumerate()
@@ -91,8 +96,21 @@ where
 
                     assert!(!denominator.is_zero());
                     *volume = na::one::<Real>() / denominator;
+
+                    contact_log.push_str(&format!(
+                        "{}: N {}, ",
+                        i, boundary_boundary_contacts[boundary_id]
+                            .particle_contacts(i).read().unwrap().len()
+                    ));
+                    volume_log.push_str(&format!(
+                        "{}: Vol {}, ",
+                        i, volume
+                    ));
                 })
         }
+
+        counters.log(contact_log.as_str());
+        counters.log(volume_log.as_str());
     }
 
     fn compute_predicted_densities(
@@ -564,6 +582,7 @@ where
 
     fn predict_advection(
         &mut self,
+        counters: &mut Counters,
         timestep: &TimestepManager,
         kernel_radius: Real,
         contact_manager: &ContactManager,
@@ -605,6 +624,7 @@ where
 
     fn evaluate_kernels(
         &mut self,
+        counters: &mut Counters,
         kernel_radius: Real,
         contact_manager: &mut ContactManager,
         fluids: &[Fluid],
@@ -619,6 +639,7 @@ where
         );
 
         helper::update_boundary_contacts::<KernelDensity, KernelGradient>(
+            counters,
             kernel_radius,
             &mut contact_manager.boundary_boundary_contacts,
             boundaries,
@@ -627,11 +648,12 @@ where
 
     fn compute_densities(
         &mut self,
+        counters: &mut Counters,
         contact_manager: &ContactManager,
         fluids: &[Fluid],
         boundaries: &mut [Boundary],
     ) {
-        self.compute_boundary_volumes(&contact_manager.boundary_boundary_contacts, boundaries);
+        self.compute_boundary_volumes(counters, &contact_manager.boundary_boundary_contacts, boundaries);
 
         for fluid_id in 0..fluids.len() {
             par_iter_mut!(self.densities[fluid_id])
@@ -691,6 +713,7 @@ where
             .for_each(|vs| vs.iter_mut().for_each(|v| v.fill(na::zero::<Real>())));
 
         self.predict_advection(
+            counters,
             timestep,
             kernel_radius,
             contact_manager,

@@ -15,6 +15,7 @@ pub trait PressureSolver {
     /// Predicts advection with the given gravity.
     fn predict_advection(
         &mut self,
+        counters: &mut Counters,
         timestep: &TimestepManager,
         kernel_radius: Real,
         contact_manager: &ContactManager,
@@ -26,6 +27,7 @@ pub trait PressureSolver {
     /// Evaluate the SPH kernels for all the contacts in `contact_manager`.
     fn evaluate_kernels(
         &mut self,
+        counters: &mut Counters,
         kernel_radius: Real,
         contact_manager: &mut ContactManager,
         fluids: &[Fluid],
@@ -35,6 +37,7 @@ pub trait PressureSolver {
     /// Compute the densities of all the boundary and fluid particles.
     fn compute_densities(
         &mut self,
+        counters: &mut Counters,
         contact_manager: &ContactManager,
         fluids: &[Fluid],
         boundaries: &mut [Boundary],

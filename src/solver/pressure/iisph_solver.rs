@@ -540,6 +540,7 @@ where
 
     fn predict_advection(
         &mut self,
+        counters: &mut Counters,
         timestep: &TimestepManager,
         kernel_radius: Real,
         contact_manager: &ContactManager,
@@ -581,6 +582,7 @@ where
 
     fn evaluate_kernels(
         &mut self,
+        counters: &mut Counters,
         kernel_radius: Real,
         contact_manager: &mut ContactManager,
         fluids: &[Fluid],
@@ -595,6 +597,7 @@ where
         );
 
         helper::update_boundary_contacts::<KernelDensity, KernelGradient>(
+            counters,
             kernel_radius,
             &mut contact_manager.boundary_boundary_contacts,
             boundaries,
@@ -603,6 +606,7 @@ where
 
     fn compute_densities(
         &mut self,
+        counters: &mut Counters,
         contact_manager: &ContactManager,
         fluids: &[Fluid],
         boundaries: &mut [Boundary],
@@ -651,6 +655,7 @@ where
         boundaries: &[Boundary],
     ) {
         self.predict_advection(
+            counters,
             timestep,
             kernel_radius,
             contact_manager,

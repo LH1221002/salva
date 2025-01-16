@@ -1,7 +1,7 @@
 //! Counters for benchmarking various parts of the physics engine.
 
 use std::fmt::{Display, Formatter, Result};
-
+use crate::counters::callback_logger::CallbackLogger;
 pub use self::collision_detection_counters::CollisionDetectionCounters;
 pub use self::solver_counters::SolverCounters;
 pub use self::stages_counters::StagesCounters;
@@ -11,6 +11,7 @@ mod collision_detection_counters;
 mod solver_counters;
 mod stages_counters;
 mod timer;
+mod callback_logger;
 
 /// Aggregation of all the performances counters tracked by salva.
 #[derive(Clone, Copy)]
@@ -27,6 +28,9 @@ pub struct Counters {
     pub cd: CollisionDetectionCounters,
     /// Counters of the constraints resolution and force computation stage.
     pub solver: SolverCounters,
+
+    /// Callback logger
+    logger: Option<&'static CallbackLogger>
 }
 
 impl Counters {
@@ -39,6 +43,7 @@ impl Counters {
             stages: StagesCounters::new(),
             cd: CollisionDetectionCounters::new(),
             solver: SolverCounters::new(),
+            logger: None,
         }
     }
 
@@ -68,6 +73,18 @@ impl Counters {
         self.stages.disable();
         self.cd.disable();
         self.solver.disable();
+    }
+
+    pub fn set_logger(&mut self, logger: &'static CallbackLogger) {
+        self.logger = Option::from(logger);
+    }
+
+    pub fn log(&self, message: &str) {
+        if let Some(logger) = self.logger {
+            logger.log(message);
+            return;
+        }
+        println!("{}", message);
     }
 }
 

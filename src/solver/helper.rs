@@ -5,6 +5,7 @@ use crate::object::{Boundary, Fluid};
 
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
+use crate::counters::Counters;
 
 pub fn update_fluid_contacts<KernelDensity: Kernel, KernelGradient: Kernel>(
     kernel_radius: Real,
@@ -44,10 +45,12 @@ pub fn update_fluid_contacts<KernelDensity: Kernel, KernelGradient: Kernel>(
 }
 
 pub fn update_boundary_contacts<KernelDensity: Kernel, KernelGradient: Kernel>(
+    counters: &mut Counters,
     kernel_radius: Real,
     boundary_boundary_contacts: &mut [ParticlesContacts],
     boundaries: &[Boundary],
 ) {
+    let mut weights_log = String::new();
     for contacts in boundary_boundary_contacts.iter_mut() {
         par_iter_mut!(contacts.contacts_mut()).for_each(|contacts| {
             for c in contacts.get_mut().unwrap() {
@@ -59,7 +62,11 @@ pub fn update_boundary_contacts<KernelDensity: Kernel, KernelGradient: Kernel>(
 
                 c.weight = KernelDensity::points_apply(&pi, &pj, kernel_radius);
                 c.gradient = KernelGradient::points_apply_diff1(&pi, &pj, kernel_radius);
+
+                weights_log.push_str(&format!("{} ", c.weight));
             }
         })
     }
+
+    counters.log(weights_log.as_str());
 }
