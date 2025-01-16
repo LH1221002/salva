@@ -167,7 +167,7 @@ pub fn compute_contacts(
 
     fluid_fluid_contacts.resize_with(fluids.len(), || ParticlesContacts::new());
     fluid_boundary_contacts.resize_with(fluids.len(), || ParticlesContacts::new());
-    boundary_boundary_contacts.resize_with(boundaries.len() - 1, || ParticlesContacts::new());
+    boundary_boundary_contacts.resize_with(boundaries.len(), || ParticlesContacts::new());
 
     for (fluid, contacts) in fluids.iter().zip(fluid_fluid_contacts.iter_mut()) {
         contacts
@@ -271,8 +271,8 @@ fn compute_contacts_for_pair_of_cells(
                     // Those will already be detected as fluid-boundary contacts instead.
                     match entry {
                         HGridEntry::BoundaryParticle(boundary_j, particle_j) => {
-                            continue;    // Simulations seems to depend on boundary-boundary contacts
-                                            // Maybe for boundary volumes?
+                            // continue;    // Simulations seems to depend on boundary-boundary contacts
+                            //                 // Maybe for boundary volumes?
 
                             let bi = &boundaries[*boundary_i];
                             let bj = &boundaries[*boundary_j];
