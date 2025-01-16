@@ -167,7 +167,11 @@ pub fn compute_contacts(
 
     fluid_fluid_contacts.resize_with(fluids.len(), || ParticlesContacts::new());
     fluid_boundary_contacts.resize_with(fluids.len(), || ParticlesContacts::new());
-    boundary_boundary_contacts.resize_with(boundaries.len(), || ParticlesContacts::new());
+
+    let skip_boundary_boundary = boundary_boundary_contacts.len() == boundaries.len();
+    if !skip_boundary_boundary {
+        boundary_boundary_contacts.resize_with(boundaries.len(), || ParticlesContacts::new());
+    }
 
     for (fluid, contacts) in fluids.iter().zip(fluid_fluid_contacts.iter_mut()) {
         contacts
@@ -189,14 +193,16 @@ pub fn compute_contacts(
             .resize_with(fluid.num_particles(), || RwLock::new(Vec::new()))
     }
 
-    for (boundary, contacts) in boundaries.iter().zip(boundary_boundary_contacts.iter_mut()) {
-        contacts
-            .contacts
-            .iter_mut()
-            .for_each(|c| c.write().unwrap().clear());
-        contacts
-            .contacts
-            .resize_with(boundary.num_particles(), || RwLock::new(Vec::new()))
+    if !skip_boundary_boundary {
+        for (boundary, contacts) in boundaries.iter().zip(boundary_boundary_contacts.iter_mut()) {
+            contacts
+                .contacts
+                .iter_mut()
+                .for_each(|c| c.write().unwrap().clear());
+            contacts
+                .contacts
+                .resize_with(boundary.num_particles(), || RwLock::new(Vec::new()))
+        }
     }
 
     #[cfg(feature = "dim2")]
@@ -238,6 +244,7 @@ pub fn compute_contacts(
                     boundaries,
                     fluid_fluid_contacts,
                     fluid_boundary_contacts,
+                    skip_boundary_boundary,
                     boundary_boundary_contacts,
                     curr_cell,
                     curr_particles,
@@ -257,6 +264,7 @@ fn compute_contacts_for_pair_of_cells(
     boundaries: &[Boundary],
     fluid_fluid_contacts: &[ParticlesContacts],
     fluid_boundary_contacts: &[ParticlesContacts],
+    skip_boundary_boundary: bool,
     boundary_boundary_contacts: &[ParticlesContacts],
     curr_cell: &Point<i64>,
     curr_particles: &[HGridEntry],
@@ -271,8 +279,10 @@ fn compute_contacts_for_pair_of_cells(
                     // Those will already be detected as fluid-boundary contacts instead.
                     match entry {
                         HGridEntry::BoundaryParticle(boundary_j, particle_j) => {
-                            // continue;    // Simulations seems to depend on boundary-boundary contacts
-                            //                 // Maybe for boundary volumes?
+                            if skip_boundary_boundary {
+                                // TODO: Could be further optimized by only iterating over fluids
+                                continue;
+                            }
 
                             let bi = &boundaries[*boundary_i];
                             let bj = &boundaries[*boundary_j];
