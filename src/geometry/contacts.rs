@@ -3,9 +3,8 @@ use crate::geometry::HGrid;
 use crate::math::{Point, Real, Vector};
 use crate::object::Boundary;
 use crate::object::Fluid;
-
 use std::sync::RwLock;
-use bevy_egui::egui::Order::Debug;
+
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
 
