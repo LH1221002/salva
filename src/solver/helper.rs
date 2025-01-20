@@ -76,10 +76,7 @@ pub fn update_boundary_contacts<KernelDensity: Kernel, KernelGradient: Kernel>(
 
 #[cfg(feature = "opt-weight")]
 fn should_skip_weight_computation(contacts: &mut ParticlesContacts) -> bool {
-    contacts.contacts().first()
-    .and_then(|c| c.read().ok())
-    .and_then(|c| c.first())
-    .map_or(false, |c| c.weight != na::zero::<Real>())
+    contacts.contacts().first().unwrap().read().unwrap().first().unwrap().weight != na::zero::<Real>()
 }
 
 #[cfg(not(feature = "opt-weight"))]
