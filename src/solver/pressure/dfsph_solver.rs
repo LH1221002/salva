@@ -115,13 +115,14 @@ where
                 })
         }
 
-        counters.log(contact_log.as_str());
-        counters.log(volume_log.as_str());
+        // counters.log(contact_log.as_str());
+        // counters.log(volume_log.as_str());
     }
 
     #[cfg(feature = "opt-volume")]
     fn should_skip_volume_computation(volumes: &[Real]) -> bool {
         // Optimization-specific computation
+        // println!("volume: {:?}", volumes.first().unwrap());
         *volumes.first().unwrap() != na::zero::<Real>()
     }
 

@@ -19,7 +19,7 @@ bevy = "0.13.2"
 
 [dependencies.salva3d]
 path = "../build/salva3d"
-features = [ "rapier", "rapier-testbed", "sampling", "rapier-harness" ]
+features = [ "rapier", "rapier-testbed", "sampling", "rapier-harness", "opt-contacts", "opt-volume", "opt-weight" ]
 
 [target.wasm32-unknown-unknown.dependencies]
 stdweb = "0.4"

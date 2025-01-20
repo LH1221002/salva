@@ -153,6 +153,7 @@ impl<'a> CouplingManager for ColliderCouplingManager<'a> {
         fluids: &mut [Fluid],
         boundaries: &mut BoundarySet,
     ) {
+
         let bodies = &self.bodies;
         for (collider, coupling) in &mut self.coupling.entries {
             if let (Some(collider), Some(boundary)) = (
@@ -167,6 +168,12 @@ impl<'a> CouplingManager for ColliderCouplingManager<'a> {
                     } else {
                         boundary.forces = Some(RwLock::new(Vec::new()));
                         boundary.clear_forces(true);
+                    }
+                }
+
+                #[cfg(feature = "opt-volume")] {
+                    if !boundary.positions.is_empty() {
+                        continue;
                     }
                 }
 

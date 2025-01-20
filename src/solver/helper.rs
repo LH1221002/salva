@@ -71,7 +71,7 @@ pub fn update_boundary_contacts<KernelDensity: Kernel, KernelGradient: Kernel>(
         })
     }
 
-    counters.log(weights_log.as_str());
+    // counters.log(weights_log.as_str());
 }
 
 #[cfg(feature = "opt-weight")]
