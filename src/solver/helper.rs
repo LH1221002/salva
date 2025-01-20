@@ -52,6 +52,9 @@ pub fn update_boundary_contacts<KernelDensity: Kernel, KernelGradient: Kernel>(
 ) {
     let mut weights_log = String::new();
     for contacts in boundary_boundary_contacts.iter_mut() {
+        if should_skip_weight_computation(contacts) {
+            continue;
+        }
         par_iter_mut!(contacts.contacts_mut()).for_each(|contacts| {
             for c in contacts.get_mut().unwrap() {
                 let bound1 = &boundaries[c.i_model];
@@ -69,4 +72,18 @@ pub fn update_boundary_contacts<KernelDensity: Kernel, KernelGradient: Kernel>(
     }
 
     counters.log(weights_log.as_str());
+}
+
+#[cfg(feature = "opt-weight")]
+fn should_skip_weight_computation(contacts: &mut ParticlesContacts) -> bool {
+    contacts.contacts().first()
+    .and_then(|c| c.read().ok())
+    .and_then(|c| c.first())
+    .map_or(false, |c| c.weight != na::zero::<Real>())
+}
+
+#[cfg(not(feature = "opt-weight"))]
+fn should_skip_weight_computation(contacts: &mut ParticlesContacts) -> bool {
+    // Default behavior
+    false
 }

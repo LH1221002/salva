@@ -33,6 +33,10 @@ parry = ["parry2d"]
 wasm-bindgen = ["rapier2d/wasm-bindgen"]
 graphics = ["bevy", "bevy_egui"]
 
+opt-contacts = []
+opt-volume = []
+opt-weight = []
+
 [lints]
 rust.unexpected_cfgs = { level = "warn", check-cfg = [
     'cfg(feature, values("dim3"))',

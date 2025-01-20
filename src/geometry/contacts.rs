@@ -168,7 +168,9 @@ pub fn compute_contacts(
     fluid_fluid_contacts.resize_with(fluids.len(), || ParticlesContacts::new());
     fluid_boundary_contacts.resize_with(fluids.len(), || ParticlesContacts::new());
 
-    let skip_boundary_boundary = boundary_boundary_contacts.len() == boundaries.len();
+    let skip_boundary_boundary =
+        should_skip_boundary_boundary(boundary_boundary_contacts, boundaries);
+
     if !skip_boundary_boundary {
         boundary_boundary_contacts.resize_with(boundaries.len(), || ParticlesContacts::new());
     }
@@ -256,6 +258,22 @@ pub fn compute_contacts(
     });
 
     counters.cd.neighborhood_search_time.pause();
+}
+
+#[cfg(feature = "opt-contacts")]
+fn should_skip_boundary_boundary(
+    boundary_boundary_contacts: &mut Vec<ParticlesContacts>,
+    boundaries: &[Boundary],
+) -> bool {
+    boundary_boundary_contacts.len() == boundaries.len()
+}
+
+#[cfg(not(feature = "opt-contacts"))]
+fn should_skip_boundary_boundary(
+    boundary_boundary_contacts: &mut Vec<ParticlesContacts>,
+    boundaries: &[Boundary],
+) -> bool {
+    false
 }
 
 fn compute_contacts_for_pair_of_cells(

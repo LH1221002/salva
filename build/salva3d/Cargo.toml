@@ -28,6 +28,10 @@ parry = ["parry3d"]
 wasm-bindgen = ["rapier3d/wasm-bindgen"]
 graphics = ["bevy", "bevy_egui"]
 
+opt-contacts = []
+opt-volume = []
+opt-weight = []
+
 [lib]
 name = "salva3d"
 path = "../../src/lib.rs"

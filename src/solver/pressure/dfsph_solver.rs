@@ -80,7 +80,13 @@ where
         let mut volume_log = String::new();
 
         for boundary_id in 0..boundaries.len() {
-            par_iter_mut!(boundaries[boundary_id].volumes)
+            let volumes = &mut boundaries[boundary_id].volumes;
+
+            if Self::should_skip_volume_computation(volumes) {
+                continue;
+            }
+
+            par_iter_mut!(volumes)
                 .enumerate()
                 .for_each(|(i, volume)| {
                     let mut denominator = na::zero::<Real>();
@@ -111,6 +117,18 @@ where
 
         counters.log(contact_log.as_str());
         counters.log(volume_log.as_str());
+    }
+
+    #[cfg(feature = "opt-volume")]
+    fn should_skip_volume_computation(volumes: &[Real]) -> bool {
+        // Optimization-specific computation
+        *volumes.first().unwrap() != na::zero::<Real>()
+    }
+
+    #[cfg(not(feature = "opt-volume"))]
+    fn should_skip_volume_computation(_volumes: &[Real]) -> bool {
+        // Default behavior
+        false
     }
 
     fn compute_predicted_densities(
